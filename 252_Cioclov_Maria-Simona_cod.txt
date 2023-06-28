@@ -1,0 +1,683 @@
+-------------------------------------------- cerinta 4 ----------------------------
+
+CREATE TABLE ADRESA(
+    id_adresa NUMBER(6) primary key,
+    judet VARCHAR2(50) NOT NULL,
+    localitate VARCHAR2(50) NOT NULL,
+    strada VARCHAR2(50) NOT NULL,
+    numar NUMBER(4)  NOT NULL,
+    bloc NUMBER(4),
+    apartament NUMBER(4)
+);
+
+CREATE TABLE FARMACIE(
+    id_farmacie NUMBER(6) primary key,
+    nume VARCHAR2(50) NOT NULL,
+    nr_telefon VARCHAR2(50) NOT NULL,
+    id_adresa NUMBER(6),
+    FOREIGN KEY (id_adresa) REFERENCES ADRESA(id_adresa) ON DELETE SET NULL
+);
+
+CREATE TABLE ANGAJAT(
+    cnp CHAR(13) primary key,
+    nume VARCHAR2(50) NOT NULL,
+    prenume VARCHAR2(50) NOT NULL,
+    nr_telefon VARCHAR2(50) NOT NULL,
+    id_adresa NUMBER(6),
+    FOREIGN KEY (id_adresa) REFERENCES ADRESA(id_adresa) ON DELETE SET NULL
+);
+
+CREATE TABLE PACIENT(
+    cnp CHAR(13) primary key,
+    nume VARCHAR2(50) NOT NULL,
+    prenume VARCHAR2(50) NOT NULL,
+    data_nasterii DATE NOT NULL, 
+    id_adresa NUMBER(6),
+    FOREIGN KEY (id_adresa) REFERENCES ADRESA(id_adresa) ON DELETE SET NULL
+);
+
+CREATE TABLE MEDIC(
+    cnp CHAR(13) primary key,
+    nume VARCHAR2(50) NOT NULL,
+    prenume VARCHAR2(50) NOT NULL,
+    specializare VARCHAR2(50) NOT NULL
+);
+
+CREATE TABLE COMPANIE_FARMACEUTICA(
+    id_companie NUMBER(6) primary key,
+    nume VARCHAR2(50) NOT NULL,
+    nr_telefon VARCHAR2(50) NOT NULL,
+    nume_contact VARCHAR2(50) NOT NULL
+);
+
+CREATE TABLE RETETA(
+    id_reteta NUMBER(6) primary key,
+    cnp_medic CHAR(13) NOT NULL,
+    cnp_pacient CHAR(13) NOT NULL, 
+    data_prescrierii DATE NOT NULL, 
+    data_expirarii DATE NOT NULL,
+    FOREIGN KEY (cnp_medic) REFERENCES MEDIC(cnp) ON DELETE CASCADE,
+    FOREIGN KEY (cnp_pacient) REFERENCES PACIENT(cnp) ON DELETE CASCADE
+);
+
+CREATE TABLE CONTRACT(
+    id_contract NUMBER(6) primary key,
+    id_farmacie NUMBER(6) NOT NULL,
+    id_companie NUMBER(6) NOT NULL, 
+    data_semnarii DATE NOT NULL, 
+    data_expirarii DATE NOT NULL,
+    FOREIGN KEY (id_farmacie) REFERENCES FARMACIE(id_farmacie) ON DELETE CASCADE,
+    FOREIGN KEY (id_companie) REFERENCES COMPANIE_FARMACEUTICA(id_companie) ON DELETE CASCADE
+);
+
+CREATE TABLE MEDICAMENT(
+    id_medicament NUMBER(6) primary key,
+    nume VARCHAR2(50) NOT NULL,
+    DCI VARCHAR2(50) NOT NULL,
+    forma VARCHAR2(50) NOT NULL,
+    id_companie NUMBER(6) NOT NULL,
+    FOREIGN KEY (id_companie) REFERENCES COMPANIE_FARMACEUTICA(id_companie) ON DELETE CASCADE
+);
+ 
+CREATE TABLE INREGISTRARE_MEDICAMENT(
+    id_farmacie NUMBER(6) NOT NULL,
+    id_medicament NUMBER(6) NOT NULL,
+    pret NUMBER(6) NOT NULL, 
+    stoc NUMBER(6) NOT NULL, 
+    PRIMARY KEY (id_farmacie, id_medicament),
+    FOREIGN KEY (id_farmacie) REFERENCES FARMACIE(id_farmacie) ON DELETE CASCADE,
+    FOREIGN KEY (id_medicament) REFERENCES MEDICAMENT(id_medicament) ON DELETE CASCADE
+);
+
+CREATE TABLE ISTORIC_DE_LUCRU(
+    id_istoric NUMBER(6) primary key,
+    id_farmacie NUMBER(6) NOT NULL,
+    cnp_angajat CHAR(13) NOT NULL, 
+    salariu NUMBER(6) NOT NULL, 
+    end_date DATE, 
+    start_date DATE NOT NULL,
+    FOREIGN KEY (id_farmacie) REFERENCES FARMACIE(id_farmacie) ON DELETE CASCADE,
+    FOREIGN KEY (cnp_angajat) REFERENCES ANGAJAT(cnp) ON DELETE CASCADE
+);
+
+CREATE TABLE PRESCRIERE(
+    id_prescriere NUMBER(6) primary key,
+    id_reteta NUMBER(6) NOT NULL,
+    id_medicament NUMBER(6) NOT NULL,
+    DS VARCHAR2(50),
+    cantitate NUMBER(6) NOT NULL,
+    FOREIGN KEY (id_reteta) REFERENCES RETETA(id_reteta) ON DELETE CASCADE,
+    FOREIGN KEY (id_medicament) REFERENCES MEDICAMENT(id_medicament) ON DELETE CASCADE
+);
+
+
+-------------------------------------------- cerinta 5 ----------------------------
+
+
+INSERT INTO ADRESA (id_adresa, judet, localitate, strada, numar) 
+VALUES ('1', 'Prahova', 'Ploiesti', 'Aleea Zanelor', '42');
+
+INSERT INTO ADRESA (id_adresa, judet, localitate, strada, numar) 
+VALUES ('2', 'Suceava', 'Falticeni', 'Margaretelor', '18');
+
+INSERT INTO ADRESA (id_adresa, judet, localitate, strada, numar) 
+VALUES ('3', 'Brasov', 'Codlea', 'Inchisorii', '11');
+
+INSERT INTO ADRESA (id_adresa, judet, localitate, strada, numar) 
+VALUES ('4', 'Braila', 'Ciresu', 'Panselutelor', '24');
+
+INSERT INTO ADRESA (id_adresa, judet, localitate, strada, numar) 
+VALUES ('5', 'Prahova', 'Valenii de Munte', 'Fat-Frumos', '16');
+
+
+
+
+INSERT INTO FARMACIE (id_farmacie, nume, nr_telefon, id_adresa) 
+VALUES ('1', 'Maria', '0737265060', '3');
+
+INSERT INTO FARMACIE (id_farmacie, nume, nr_telefon, id_adresa) 
+VALUES ('2', 'Ioana', '0737265061', '1');
+
+INSERT INTO FARMACIE (id_farmacie, nume, nr_telefon, id_adresa) 
+VALUES ('3', 'Andreea', '0737265062', '4');
+
+INSERT INTO FARMACIE (id_farmacie, nume, nr_telefon, id_adresa) 
+VALUES ('4', 'Sofia', '0737265063', '5');
+
+INSERT INTO FARMACIE (id_farmacie, nume, nr_telefon, id_adresa) 
+VALUES ('5', 'Dana', '0737265064', '2');
+
+
+
+
+INSERT INTO PACIENT (cnp, nume, prenume, data_nasterii) 
+VALUES ('1236878800020', 'Mirunescu', 'Miruna', '16-01-2002');
+
+INSERT INTO PACIENT (cnp, nume, prenume, data_nasterii) 
+VALUES ('1236878800021', 'Albu', 'Gabriela', '26-07-1976');
+
+INSERT INTO PACIENT (cnp, nume, prenume, data_nasterii) 
+VALUES ('1236878800022', 'Popescu', 'Florentina', '22-06-1953');
+
+INSERT INTO PACIENT (cnp, nume, prenume, data_nasterii) 
+VALUES ('1236878800023', 'Coada', 'Vlad', '07-11-1952');
+
+INSERT INTO PACIENT (cnp, nume, prenume, data_nasterii) 
+VALUES ('1236878800024', 'Dunareanu', 'Matei', '23-11-1981');
+
+
+
+INSERT INTO MEDIC (cnp, nume, prenume, specializare) 
+VALUES ('3216168800021', 'Ionescu', 'Ion', 'cardiolog');
+
+INSERT INTO MEDIC (cnp, nume, prenume, specializare) 
+VALUES ('3216168800022', 'Stefanescu', 'Stefania', 'stomaolog');
+
+INSERT INTO MEDIC (cnp, nume, prenume, specializare) 
+VALUES ('3216168800023', 'Sorescu', 'Sorana', 'oftalmmolog');
+
+INSERT INTO MEDIC (cnp, nume, prenume, specializare) 
+VALUES ('3216168800024', 'Cristescu', 'Cristian', 'dermatolog');
+
+INSERT INTO MEDIC (cnp, nume, prenume, specializare) 
+VALUES ('3216168800025', 'Alexandrescu', 'Alexia', 'cardiolog');
+
+
+
+INSERT INTO ANGAJAT (cnp, nume, prenume, nr_telefon) 
+VALUES ('9236168847021', 'Deleanu', 'Elisabeta', '0720530902');
+
+INSERT INTO ANGAJAT (cnp, nume, prenume, nr_telefon) 
+VALUES ('9236168847022', 'Marinescu', 'Marina', '0720530903');
+
+INSERT INTO ANGAJAT (cnp, nume, prenume, nr_telefon) 
+VALUES ('9236168847023', 'Popescu', 'Andrei', '0720530904');
+
+INSERT INTO ANGAJAT (cnp, nume, prenume, nr_telefon) 
+VALUES ('9236168847024', 'Pop', 'Alin', '0720530905');
+
+INSERT INTO ANGAJAT (cnp, nume, prenume, nr_telefon) 
+VALUES ('9236168847025', 'Olteanu', 'Stefan', '0720530906');
+
+
+
+
+INSERT INTO COMPANIE_FARMACEUTICA (id_companie, nume, nr_telefon, nume_contact) 
+VALUES ('1', 'LABORMED PHARMA S.A.', '0722171360', 'Andreescu Andrei');
+
+INSERT INTO COMPANIE_FARMACEUTICA (id_companie, nume, nr_telefon, nume_contact) 
+VALUES ('2', 'TERAPIA S.A.', '0722171361', 'Mircescu Mircea');
+
+INSERT INTO COMPANIE_FARMACEUTICA (id_companie, nume, nr_telefon, nume_contact) 
+VALUES ('3', 'GEDEON RICHTER ROMANIA S.A.', '0722171362', 'Paulescu Paul');
+
+INSERT INTO COMPANIE_FARMACEUTICA (id_companie, nume, nr_telefon, nume_contact) 
+VALUES ('4', 'ZENTIVA S.A.', '0722171363', 'Stefanescu Stefan');
+
+INSERT INTO COMPANIE_FARMACEUTICA (id_companie, nume, nr_telefon, nume_contact) 
+VALUES ('5', 'BIOFARM S.A.', '0722171364', 'Ionescu Ion');
+
+
+
+INSERT INTO MEDICAMENT (id_medicament, nume, DCI, forma, id_companie) 
+VALUES ('1', 'TANTUM VERDE CU AROMA DE LAMAIE 3 mg', 'BENYDAMINUM', 'PASTILE', '3');
+
+INSERT INTO MEDICAMENT (id_medicament, nume, DCI, forma, id_companie) 
+VALUES ('2', 'ZONTIVITY 2mg', 'VORAPAXAR', 'COMPR. FILM.', '2');
+
+INSERT INTO MEDICAMENT (id_medicament, nume, DCI, forma, id_companie) 
+VALUES ('3', 'FAMODIN 40', 'FAMOTIDINUM', 'COMPR. FILM.', '5');
+
+INSERT INTO MEDICAMENT (id_medicament, nume, DCI, forma, id_companie) 
+VALUES ('4', 'CIMETIDINA ARENA 200 mg', 'CIMETIDINUM', 'CAPS', '4');
+
+INSERT INTO MEDICAMENT (id_medicament, nume, DCI, forma, id_companie) 
+VALUES ('5', 'ORTANOL 20 mg', 'OMEPRAZOLUM', 'CAPS. GASTROREZ.', '1');
+
+INSERT INTO MEDICAMENT (id_medicament, nume, DCI, forma, id_companie) 
+VALUES ('6', 'ORTANOL 40 mg', 'OMEPRAZOLUM', 'CAPS. GASTROREZ.', '3');
+
+INSERT INTO MEDICAMENT (id_medicament, nume, DCI, forma, id_companie) 
+VALUES ('7', 'VISIPAQUE 320 mg I/ml', 'IODIXANOLUM', 'SOL.INJ.', '2');
+
+INSERT INTO MEDICAMENT (id_medicament, nume, DCI, forma, id_companie) 
+VALUES ('8', 'ANTISPASMIN FORTE 80 mg', 'DROTAVERINUM', 'COMPR.', '5');
+
+INSERT INTO MEDICAMENT (id_medicament, nume, DCI, forma, id_companie) 
+VALUES ('9', 'PAPAVERINA ARENA 50 mg', 'PAPAVERINI HYDROCHLORIDUM', 'COMPR.', '3');
+
+
+
+
+INSERT INTO INREGISTRARE_MEDICAMENT (id_farmacie, id_medicament, pret, stoc) 
+VALUES (1, 5, 15, 7);
+
+INSERT INTO INREGISTRARE_MEDICAMENT (id_farmacie, id_medicament, pret, stoc) 
+VALUES (2, 4, 7, 20);
+
+INSERT INTO INREGISTRARE_MEDICAMENT (id_farmacie, id_medicament, pret, stoc) 
+VALUES (3, 2, 20, 33);
+
+INSERT INTO INREGISTRARE_MEDICAMENT (id_farmacie, id_medicament, pret, stoc) 
+VALUES (4, 3, 32, 0);
+
+INSERT INTO INREGISTRARE_MEDICAMENT (id_farmacie, id_medicament, pret, stoc) 
+VALUES (5, 1, 66, 14);
+
+INSERT INTO INREGISTRARE_MEDICAMENT (id_farmacie, id_medicament, pret, stoc) 
+VALUES (4, 6, 17, 2);
+
+INSERT INTO INREGISTRARE_MEDICAMENT (id_farmacie, id_medicament, pret, stoc) 
+VALUES (3, 9, 28, 25);
+
+INSERT INTO INREGISTRARE_MEDICAMENT (id_farmacie, id_medicament, pret, stoc) 
+VALUES (2, 7, 80, 9);
+
+INSERT INTO INREGISTRARE_MEDICAMENT (id_farmacie, id_medicament, pret, stoc) 
+VALUES (2, 1, 40, 12);
+
+INSERT INTO INREGISTRARE_MEDICAMENT (id_farmacie, id_medicament, pret, stoc) 
+VALUES (3, 8, 9, 0);
+
+
+
+INSERT INTO RETETA (id_reteta, cnp_medic, cnp_pacient, data_prescrierii, data_expirarii) 
+VALUES (1, '3216168800024', '1236878800022', '16-01-2022', '16-02-2022');
+
+INSERT INTO RETETA (id_reteta, cnp_medic, cnp_pacient, data_prescrierii, data_expirarii) 
+VALUES (2, '3216168800021', '1236878800024', '24-04-2022', '7-05-2022');
+
+INSERT INTO RETETA (id_reteta, cnp_medic, cnp_pacient, data_prescrierii, data_expirarii) 
+VALUES (3, '3216168800025', '1236878800023', '20-12-2022', '20-01-2023');
+
+INSERT INTO RETETA (id_reteta, cnp_medic, cnp_pacient, data_prescrierii, data_expirarii) 
+VALUES (4, '3216168800023', '1236878800022', '10-01-2023', '10-03-2023');
+
+INSERT INTO RETETA (id_reteta, cnp_medic, cnp_pacient, data_prescrierii, data_expirarii) 
+VALUES (5, '3216168800022', '1236878800020', '25-05-2022', '05-06-2022');
+
+INSERT INTO RETETA (id_reteta, cnp_medic, cnp_pacient, data_prescrierii, data_expirarii) 
+VALUES (6, '3216168800022', '1236878800020', '10-11-2022', '20-11-2022');
+
+
+
+
+INSERT INTO CONTRACT (id_contract, id_farmacie, id_companie, data_semnarii, data_expirarii) 
+VALUES (1, 1, 4, '16-01-2022', '16-05-2023');
+
+INSERT INTO CONTRACT (id_contract, id_farmacie, id_companie, data_semnarii, data_expirarii) 
+VALUES (2, 3, 3, '24-04-2022', '24-04-2025');
+
+INSERT INTO CONTRACT (id_contract, id_farmacie, id_companie, data_semnarii, data_expirarii) 
+VALUES (3, 2, 1, '20-02-2022', '20-07-2022');
+
+INSERT INTO CONTRACT (id_contract, id_farmacie, id_companie, data_semnarii, data_expirarii) 
+VALUES (4, 4, 2, '20-02-2008', '30-04-2012');
+
+INSERT INTO CONTRACT (id_contract, id_farmacie, id_companie, data_semnarii, data_expirarii) 
+VALUES (5, 5, 5, '15-04-2022', '15-04-2023');
+
+INSERT INTO CONTRACT (id_contract, id_farmacie, id_companie, data_semnarii, data_expirarii) 
+VALUES (6, 2, 4, '12-01-2023', '12-01-2027');
+
+
+
+
+INSERT INTO ISTORIC_DE_LUCRU (id_istoric, id_farmacie, cnp_angajat, salariu, start_date) 
+VALUES (1,2,'9236168847023',3003,'10-06-2022');
+
+INSERT INTO ISTORIC_DE_LUCRU (id_istoric, id_farmacie, cnp_angajat, salariu, start_date, end_date) 
+VALUES (2,4,'9236168847023',3500,'10-08-2021', '20-09-2021');
+
+INSERT INTO ISTORIC_DE_LUCRU (id_istoric, id_farmacie, cnp_angajat, salariu, start_date, end_date) 
+VALUES (3,3,'9236168847022',3400,'10-03-2022', '20-07-2022');
+
+INSERT INTO ISTORIC_DE_LUCRU (id_istoric, id_farmacie, cnp_angajat, salariu, start_date) 
+VALUES (4,1,'9236168847025',3050,'10-06-2020');
+
+INSERT INTO ISTORIC_DE_LUCRU (id_istoric, id_farmacie, cnp_angajat, salariu, start_date, end_date) 
+VALUES (5,5,'9236168847023',4000,'10-06-2018', '20-06-2020');
+
+INSERT INTO ISTORIC_DE_LUCRU (id_istoric, id_farmacie, cnp_angajat, salariu, start_date) 
+VALUES (6,4,'9236168847024',3650,'5-01-2023');
+
+INSERT INTO ISTORIC_DE_LUCRU (id_istoric, id_farmacie, cnp_angajat, salariu, start_date, end_date) 
+VALUES (7,4,'9236168847024',3210, '18-05-2019', '20-06-2021');
+
+INSERT INTO ISTORIC_DE_LUCRU (id_istoric, id_farmacie, cnp_angajat, salariu, start_date) 
+VALUES (8,1,'9236168847021',3478, '10-03-2022');
+
+
+
+
+INSERT INTO PRESCRIERE (id_prescriere, id_reteta, id_medicament, DS, cantitate) 
+VALUES (1, 1, 5, '1CP/ZI', 10);
+
+INSERT INTO PRESCRIERE (id_prescriere, id_reteta, id_medicament, DS, cantitate) 
+VALUES (2, 1, 2, '2CP/ZI', 15);
+
+INSERT INTO PRESCRIERE (id_prescriere, id_reteta, id_medicament, DS, cantitate) 
+VALUES (3, 2, 3, '2CP/ZI', 15);
+
+INSERT INTO PRESCRIERE (id_prescriere, id_reteta, id_medicament, cantitate) 
+VALUES (4, 2, 6, 1);
+
+INSERT INTO PRESCRIERE (id_prescriere, id_reteta, id_medicament, DS, cantitate) 
+VALUES (5, 2, 4, '3CP/ZI', 20);
+
+INSERT INTO PRESCRIERE (id_prescriere, id_reteta, id_medicament, DS, cantitate) 
+VALUES (6, 3, 1, '2CP/ZI', 35);
+
+INSERT INTO PRESCRIERE (id_prescriere, id_reteta, id_medicament, cantitate) 
+VALUES (7, 4, 6, 2);
+
+INSERT INTO PRESCRIERE (id_prescriere, id_reteta, id_medicament, DS, cantitate) 
+VALUES (8, 4, 5, '2CP/ZI', 18);
+
+INSERT INTO PRESCRIERE (id_prescriere, id_reteta, id_medicament, DS, cantitate) 
+VALUES (9, 4, 2, '2CP/ZI', 10);
+
+INSERT INTO PRESCRIERE (id_prescriere, id_reteta, id_medicament, DS, cantitate) 
+VALUES (10, 5, 3, '3CP/ZI', 18);
+
+
+-------------------------------------------- cerinta 6 ----------------------------
+
+CREATE OR REPLACE PROCEDURE procedura
+    AS 
+        TYPE tablou_indexat IS TABLE OF istoric_de_lucru.salariu%type INDEX BY VARCHAR2(13);
+        salarii tablou_indexat; 
+        
+        TYPE tablou_imbricat IS TABLE OF angajat.nume%type;
+        nume_angajati tablou_imbricat := tablou_imbricat();
+        
+        CURSOR c IS 
+                SELECT nume, prenume, id_istoric, salariu
+                FROM istoric_de_lucru i, angajat a
+                WHERE i.cnp_angajat = a.cnp AND i.end_date IS NULL
+                ORDER BY salariu;
+    
+    BEGIN
+        FOR i in c LOOP
+            EXIT WHEN c%ROWCOUNT > 3 OR c%NOTFOUND;
+            nume_angajati.extend;
+            nume_angajati(nume_angajati.LAST) := i.nume || ' ' || i.prenume;
+            salarii(i.id_istoric) := i.salariu;
+            
+            dbms_output.put_line('Angajatul ' || nume_angajati(nume_angajati.LAST) || ' are salariul ' || TO_CHAR(salarii(i.id_istoric)));
+            UPDATE istoric_de_lucru SET salariu = salariu * 1.05 WHERE id_istoric = i.id_istoric;
+            salarii(i.id_istoric) := salarii(i.id_istoric) * 1.05;
+            dbms_output.put_line('Noul salariu este ' || TO_CHAR(salarii(i.id_istoric)));
+            dbms_output.put_line('');
+        END LOOP;
+    
+    END;
+ /   
+BEGIN
+    procedura();
+END;
+
+
+-------------------------------------------- cerinta 7 ----------------------------
+
+CREATE OR REPLACE PROCEDURE procedura2
+    AS 
+        med       medicament.nume%type;
+        stoc      inregistrare_medicament.stoc%type;
+        
+        CURSOR c (parametru NUMBER) IS 
+            SELECT nume, stoc
+            FROM medicament m
+            JOIN inregistrare_medicament i ON m.id_medicament = i.id_medicament
+            WHERE i.id_farmacie = parametru and m.id_companie = 3;
+    
+    BEGIN
+        FOR farmacie in (SELECT id_farmacie id, nume
+                         FROM farmacie f, adresa a
+                         WHERE f.id_adresa = a.id_adresa and a.judet = 'Suceava') 
+        LOOP
+            dbms_output.put_line('Farmacia ' || farmacie.nume || ':');
+            
+            OPEN c(farmacie.id);
+            LOOP
+                FETCH c INTO med, stoc;
+                EXIT WHEN c%NOTFOUND;
+                CASE WHEN stoc = 0
+                    THEN dbms_output.put_line('     ' || med || ' NU MAI ESTE IN STOC');
+                ELSE dbms_output.put_line('     ' || med || ' - ' || stoc || ' bucati');
+                END CASE;
+            END LOOP;
+            CLOSE c;
+    
+            dbms_output.put_line('');
+        END LOOP;
+    
+    END;
+/
+
+BEGIN
+    procedura2();
+END;
+
+
+-------------------------------------------- cerinta 8 ----------------------------
+
+
+CREATE OR REPLACE FUNCTION gaseste_farmacia
+    (v_loc adresa.localitate%type,
+     v_id_medicament medicament.id_medicament%type)
+RETURN farmacie.id_farmacie%type 
+    IS 
+        localitate_inexistenta EXCEPTION;
+        id_inexistent EXCEPTION;
+        farmacie_inexistenta EXCEPTION;
+        id_farm farmacie.id_farmacie%type := -1;
+        contor INT := 0;
+        no_id INT;
+        no_loc INT;
+    BEGIN
+        SELECT COUNT(*) INTO no_loc FROM adresa WHERE localitate = v_loc;
+        IF no_loc = 0 THEN RAISE localitate_inexistenta;
+        END IF;
+        
+        SELECT COUNT(*) INTO no_id FROM medicament WHERE id_medicament = v_id_medicament;
+        IF no_id = 0 THEN RAISE id_inexistent;
+        END IF;
+        
+        -- folosesc tabelele adresa, farmacie, inregistrare_medicament
+        FOR i IN (SELECT f.id_farmacie id
+                  FROM farmacie f
+                  JOIN inregistrare_medicament inreg ON f.id_farmacie = inreg.id_farmacie
+                  JOIN adresa a ON a.id_adresa = f.id_adresa
+                  WHERE inreg.id_medicament = v_id_medicament and a.localitate = v_loc)
+        LOOP
+            contor := contor + 1;
+            id_farm := i.id;
+            EXIT;
+        END LOOP;
+        
+        IF contor = 0 THEN RAISE farmacie_inexistenta;
+        END IF;
+        
+        RETURN id_farm;
+    
+    EXCEPTION
+        WHEN localitate_inexistenta THEN  
+            dbms_output.put_line('Localiatea nu exista in baza de date');
+            RETURN null;
+        WHEN id_inexistent THEN  
+            dbms_output.put_line('Id-ul medicamentului nu exista in baza de date');
+            RETURN null;
+        WHEN farmacie_inexistenta THEN  
+            dbms_output.put_line('Medicamentul nu se gaseste la nicio farmacie din aceasta localitate');
+            RETURN null;
+        WHEN OTHERS THEN
+            dbms_output.put_line('Eroare!');
+            RETURN null;
+            
+END gaseste_farmacia;
+/
+
+
+BEGIN
+    dbms_output.put_line(gaseste_farmacia('Localitate', 4));
+END;
+/
+BEGIN
+    dbms_output.put_line(gaseste_farmacia('Ploiesti', 100));
+END;
+/
+BEGIN
+    dbms_output.put_line(gaseste_farmacia('Ploiesti', 2));
+END;
+/
+BEGIN
+    dbms_output.put_line(gaseste_farmacia('Ploiesti', 4));
+END;
+
+
+-------------------------------------------- cerinta 9 ----------------------------
+
+
+CREATE OR REPLACE PROCEDURE procedura3 (v_nume medic.nume%type, v_data reteta.data_prescrierii%type)
+    AS
+        CURSOR c IS 
+            SELECT m.nume as medicament, NVL(p.ds, 'neprecizat') as doza, CONCAT(p1.nume, CONCAT(' ', p1.prenume)) as pacient
+            FROM prescriere p
+            JOIN medicament m ON m.id_medicament = p.id_medicament
+            JOIN reteta r ON p.id_reteta = r.id_reteta
+            JOIN medic m1 ON m1.cnp = r.cnp_medic
+            JOIN pacient p1 ON p1.cnp = r.cnp_pacient
+            WHERE  LOWER(m1.nume) = LOWER(v_nume) AND r.data_prescrierii <= v_data;
+            
+        medic_inexistent EXCEPTION;
+        mai_multi_medici EXCEPTION;
+        prescrieri_inexistente EXCEPTION;
+        
+        nr_medici INT;
+        nr_prescrieri INT := 0;
+    BEGIN
+        SELECT COUNT(*) INTO nr_medici FROM medic WHERE LOWER(nume) = LOWER(v_nume);
+        IF nr_medici = 0 THEN RAISE medic_inexistent;
+        ELSIF nr_medici > 1 THEN RAISE mai_multi_medici;
+        END IF;
+        
+        FOR i IN c LOOP
+            EXIT WHEN c%NOTFOUND;
+            dbms_output.put_line(i.pacient || ', ' || i.medicament || ', ' || i.doza);
+            nr_prescrieri := nr_prescrieri + 1;
+        END LOOP;
+    
+        IF nr_prescrieri = 0 THEN RAISE prescrieri_inexistente;
+        END IF;
+        
+    EXCEPTION
+        WHEN prescrieri_inexistente THEN dbms_output.put_line('Nu exista nicio prescriere.');
+        WHEN medic_inexistent THEN dbms_output.put_line('Nu exista un medic cu acel nume.');
+        WHEN mai_multi_medici THEN dbms_output.put_line('Exista mai multi medici cu acel nume.');
+        WHEN OTHERS THEN dbms_output.put_line('Eroare!');
+
+END procedura3;
+/
+
+BEGIN
+    procedura3('Ionescu', '30-04-2022');
+END;
+/
+BEGIN
+    procedura3('', '30-04-2022');
+END;
+/
+BEGIN
+    procedura3('Ionescu', '30-04-1000');
+END;
+/
+BEGIN
+    procedura3('Alexandrescu', '30-04-2022');
+END;
+/
+
+
+-------------------------------------------- cerinta 10 ----------------------------
+
+
+CREATE OR REPLACE TRIGGER contract_neprielnic
+BEFORE INSERT OR UPDATE ON contract
+DECLARE
+    zi_saptamana CHAR(10);
+    zi_luna CHAR(10);
+BEGIN
+    SELECT TO_CHAR(SYSDATE, 'Day') INTO zi_saptamana FROM dual;
+    SELECT TO_CHAR(SYSDATE, 'dd') INTO zi_luna FROM dual;
+    
+    dbms_output.put_line(zi_saptamana || ' ' || zi_luna);
+    
+    IF zi_saptamana = 'Vineri' AND zi_luna = 13
+        THEN RAISE_APPLICATION_ERROR(-20001,'In zilele de vineri 13 nu se adauga si nu se modifa contracte.');
+    END IF;
+END; 
+
+
+INSERT INTO contract (id_contract, id_farmacie, id_companie, data_semnarii, data_expirarii) 
+VALUES (7, 1, 4, '02-07-2023', '06-09-2024');
+
+
+-------------------------------------------- cerinta 11 ----------------------------
+
+
+CREATE OR REPLACE TRIGGER update_stoc
+    BEFORE UPDATE ON inregistrare_medicament
+    FOR EACH ROW
+BEGIN
+    IF :OLD.stoc > 0 and :NEW.stoc = 0
+        THEN dbms_output.put_line('La farmacia cu id-ul ' || :OLD.id_farmacie || ', stocul de medicamente cu id-ul ' || :OLD.id_medicament || ' a fost epuizat');
+    ELSIF :NEW.stoc < 0
+        THEN RAISE_APPLICATION_ERROR(-20001,'Stoc depasit');
+    ELSIF :OLD.stoc = 0 and :NEW.stoc > 0
+        THEN dbms_output.put_line('La farmacia cu id-ul ' || :OLD.id_farmacie || ', medicamentul cu id-ul ' || :OLD.id_medicament || ' a reaparut in stoc');
+    END IF;
+END; 
+
+UPDATE inregistrare_medicament 
+SET stoc = 0
+WHERE id_farmacie = 4 and id_medicament = 6;   
+
+UPDATE inregistrare_medicament 
+SET stoc = 5
+WHERE id_farmacie = 4 and id_medicament = 6;   
+
+UPDATE inregistrare_medicament 
+SET stoc = -2
+WHERE id_farmacie = 4 and id_medicament = 6;   
+
+
+-------------------------------------------- cerinta 12 ----------------------------
+
+
+CREATE TABLE istoric_creare_tabele
+(
+    utilizator VARCHAR(30),
+    data TIMESTAMP(3),
+    obiect VARCHAR(30)
+);
+
+CREATE OR REPLACE TRIGGER created_table
+AFTER CREATE ON DATABASE
+BEGIN
+    INSERT INTO istoric_creare_tabele
+    VALUES (SYS.LOGIN_USER, SYSTIMESTAMP, SYS.DICTIONARY_OBJ_NAME);
+END;
+
+CREATE TABLE tabel
+(
+    atribut INT
+);
+
+
+
+
+
+
+
+
+
